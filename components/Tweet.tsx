@@ -1,5 +1,5 @@
-import React from 'react'
-import { Tweet } from '../typings'
+import React, { useEffect, useState } from 'react'
+import { Comment, Tweet } from '../typings'
 import TimeAgo from 'react-timeago'
 import {
     ChatAlt2Icon,
@@ -7,12 +7,24 @@ import {
     SwitchHorizontalIcon,
     UploadIcon,
 } from '@heroicons/react/outline'
+import { fetchComments } from '../utils/fetchComments'
 
 interface Props {
     tweet: Tweet
 }
 
 function Tweet({ tweet }: Props ) {
+    const [comments, setComments] = useState<Comment[]>([])
+
+    const refreshComments = async () => {
+        const comments: Comment[] = await fetchComments(tweet._id)
+        setComments(comments)
+    }
+
+    useEffect(() => {
+        refreshComments()
+    }, [])
+
   return (
     <div className='flex flex-col space-x-3 border-y p-5 border-gray-100'>
         <div className='flex spcae-x-3'>
@@ -39,6 +51,7 @@ function Tweet({ tweet }: Props ) {
         <div className='flex justify-between mt-5'>
             <div className="flex cursor-pointer items-centers space-x-3 text-gray-400">
                 <ChatAlt2Icon className='h-5 w-5' />
+                <p>5</p>
             </div>
 
             <div className="flex cursor-pointer items-centers space-x-3 text-gray-400">
@@ -53,6 +66,20 @@ function Tweet({ tweet }: Props ) {
                 <UploadIcon className='h-5 w-5' />
             </div>
         </div>
+
+        {/* Comment Box Logic */}
+
+        {comments?.length > 0 && (
+            <div>
+                {comments.map(comment => (
+                    <div key={comment._id}>
+                        <img src={comment.profileImg} alt="" />
+                    </div>
+                ))}
+            </div>
+        )}
+
+        {}
     </div>
   )
 }
